@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-nginx
+  namespace: andy
+spec:
+  replicas: 1
+  minReadySeconds: 10 #表示Port起來要等10秒 有延遲方便查看效果
+  selector:
+    matchLabels:
+      service: web-nginx
+  template:
+    metadata:
+      labels:
+        service: web-nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: web-nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: web-confd-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+        - name: web-nginx-config
+          configMap:
+            name: web-nginx-config
+        - name: web-confd-config
+          configMap:
+            name: web-confd-config
